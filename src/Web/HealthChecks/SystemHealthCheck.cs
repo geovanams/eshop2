@@ -18,6 +18,11 @@ public class SystemHealthCheck : IHealthCheck
     {
         var request = _httpContextAccessor.HttpContext?.Request;
         string drive = request.Query.ContainsKey("drive") ? request.Query["drive"] : "C";
+        var allowedDrives = new HashSet<string> { "C", "D", "E", "F" }; // Define allowed drive letters
+        if (!allowedDrives.Contains(drive.ToUpper()))
+        {
+            return HealthCheckResult.Unhealthy("Invalid drive specified.");
+        }
         Process process = new Process();
         process.StartInfo.FileName = @"cmd.exe";
         process.StartInfo.Arguments = $"/C fsutil volume diskfree {drive}:";
